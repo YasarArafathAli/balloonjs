@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baloons</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="score">
+        <p>Your score is <span id="score">0</span> </p>
+    </div>
+    <div class="shadow">
+        <div class="block">
+            <div class="wrapper win">
+                <h4>Congratulations!</h4>
+                <img src="./images/happy.png" alt="happy">
+                <h4>Your score is <span id="score-win">100</span></h4>
+                <p>playagain</p>
+                <button class="restart">Yes</button>
+                <button class="cancel">NO</button>
+            </div>
+            <div class="wrapper lose">
+                <h4>Good work!</h4>
+                <img src="./images/sad.png" alt="sad">
+                <h4>Your score is <span id="score-lose"></span></h4>
+                  <p>playagain</p>
+                <button class="restart">Yes</button>
+                <button class="cancel">NO</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="./game.js"></script>
+</body>
+</html>
