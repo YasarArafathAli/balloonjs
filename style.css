@@ -37,14 +37,10 @@ button:focus{
 
 .home h1{
     font-family: 'Yesteryear', cursive;
-
     font-size: 90px;
    
 }
-/* .mania{
-     font-family: 'Potta One',cursive;
 
-} */
 .home p{
     padding: 20px 50px;
     font-family: 'Raleway',sans-serif;
@@ -141,7 +137,7 @@ button:focus{
 }
 
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 768px) {
     .btn{
         transform: scale(1.5);
         margin: 50px;
@@ -150,7 +146,14 @@ button:focus{
         max-width: 60vw;
         min-width: 60vw;
         padding: 20px;
-        margin: 40px;
+        margin: 20px;
+    }
+    .home{
+        padding: 40px;
+    }
+
+    .home h1{
+        font-size: 70px;
     }
     .balloon {
         width: 50px;
