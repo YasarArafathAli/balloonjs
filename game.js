@@ -10,10 +10,42 @@ let total = 10;
 let shadow = document.querySelector(".shadow")
 let win = document.querySelector(".win");
 let lose = document.querySelector(".lose")
-let balooninterval = setInterval(createBalloon, 1200);
+let restartbtn = document.getElementsByClassName("restart")
+let homebtn = document.getElementsByClassName("gohome")
+
+let home = document.querySelector(".home")
+let easybtn = document.querySelector("#easy")
+let hardbtn = document.querySelector("#hard")
+
+let intervals = []
+easybtn.addEventListener("click",() => easy())
+hardbtn.addEventListener("click",() => hard())
 
 
-function createBalloon() {
+
+
+function easy() {
+    home.style.display = "none"
+    let ballooninterval1 = setInterval(createBalloon, 1200);
+    intervals = [ballooninterval1];
+    total = 35;
+    console.log(total);
+    
+}
+
+function hard() {
+    home.style.display = "none"
+    let ballooninterval1 = setInterval(createBalloon, 1200);
+    let ballooninterval2 = setInterval(createBalloon, 1000);
+    intervals = [ballooninterval1, ballooninterval2];
+    total = 50;
+    console.log(total);
+}       
+
+console.log(total);
+
+
+function createBalloon() { 
     let balloon = document.createElement("div");
     let randomColor = Math.floor(Math.random() * colors.length);
     let randomPos = Math.floor(Math.random() * 95);
@@ -58,8 +90,11 @@ function deleteBalloon(elem) {
 }
 
 function gameOver() {
-    clearInterval(balooninterval)
-    if (score > 50) {
+    intervals.map((interval) => {
+        clearInterval(interval)
+
+    })
+    if (score > total) {
         shadow.style.display = "block"
         win.style.display = "block";
         lose.style.display = "none"
@@ -76,16 +111,18 @@ function gameOver() {
 
 
 
-// let balloons = document.querySelector(".balloon");
-// for (let i = 0; i < balloons.length; i++) {
-//     balloons[i].addEventListener("click", () => deleteBalloon(balloons[i]));
-// }
-
-// document.addEventListener("click", (event) => {
-//     if (event.target.classList.contains("balloon")) {
-//         deleteBalloon(event.target);
-//     }
-// })
+for (let i = 0; i < 2; i++){
+    restartbtn[i].addEventListener("click", () => {
+        score = 0;
+        missed = 0;
+        scoreblock.innerText = score;
+        shadow.style.display = "none";
+        console.log("clicked");
+        let balooninterval = setInterval(createBalloon, 1200);
+        
+    })
+    homebtn[i].addEventListener("click", () => location.reload())
+}
 
 
 
