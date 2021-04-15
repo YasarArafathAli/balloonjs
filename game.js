@@ -4,6 +4,13 @@ let windowHeight = window.innerHeight;
 let scoreblock = document.getElementById('score');
 let scoreWin = document.getElementById('score-win');
 let scoreLose = document.getElementById('score-lose');
+let missed = 0;
+let score = 0;
+let total = 10;
+let shadow = document.querySelector(".shadow")
+let win = document.querySelector(".win");
+let lose = document.querySelector(".lose")
+let balooninterval = setInterval(createBalloon, 1200);
 
 
 function createBalloon() {
@@ -13,31 +20,34 @@ function createBalloon() {
     console.log(`balloon-${colors[randomColor]}`);
     balloon.classList.add("balloon", `balloon-${colors[randomColor]}`);
     balloon.style.left = `${randomPos}vw`;
-    document.body.appendChild(balloon)
+    document.body.appendChild(balloon);
     animateBalloon(balloon);
+    balloon.addEventListener("click", () => deleteBalloon(balloon));
 }
 
-    let balooninterval = setInterval(createBalloon,1200)
 
 function animateBalloon(elem) {
     let pos = 100
-    let randPos = (Math.random() * (0.4) + 0.3).toFixed(1);
-    let interval = setInterval(frame,10)
+    let randPos = (Math.random() * (0.3) + 0.3).toFixed(1);
+    let interval = setInterval(frame, 10);
     console.log(randPos);
     function frame() {
         if (pos <= -40) {
-            clearInterval(interval)
+            clearInterval(interval);
+            missed++;
+            if (missed > 5) {
+                gameOver();
+            }
         }
         else {
 
             pos= pos-randPos;
-            elem.style.top =  pos + "vh"
+            elem.style.top = pos + "vh";
         }
     }
 
 }
-let score = 0;
-let total = 10;
+
 
 function deleteBalloon(elem) {
     elem.remove();
@@ -47,16 +57,35 @@ function deleteBalloon(elem) {
     scoreLose.innerText = score;
 }
 
+function gameOver() {
+    clearInterval(balooninterval)
+    if (score > 50) {
+        shadow.style.display = "block"
+        win.style.display = "block";
+        lose.style.display = "none"
+
+    }
+    else {
+        shadow.style.display = "block"
+        lose.style.display = "block";
+        win.style.display = "none";
+
+    }
+}
+
+
+
+
 // let balloons = document.querySelector(".balloon");
 // for (let i = 0; i < balloons.length; i++) {
 //     balloons[i].addEventListener("click", () => deleteBalloon(balloons[i]));
 // }
 
-document.addEventListener("click", (event) => {
-    if (event.target.classList.contains("balloon")) {
-        deleteBalloon(event.target);
-    }
-})
+// document.addEventListener("click", (event) => {
+//     if (event.target.classList.contains("balloon")) {
+//         deleteBalloon(event.target);
+//     }
+// })
 
 
 

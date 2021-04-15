@@ -11,8 +11,8 @@ body{
 }
 
 .balloon{
-    width: 100px;
-    height: 200px;
+    width: 80px;
+    height: 160px;
     position: absolute;
     top: 100vh;
     background-size: cover;
@@ -68,4 +68,12 @@ body{
     border-top-right-radius: 20px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
 
+}
+
+
+@media screen and (max-width: 700px) {
+    .balloon {
+        width: 50px;
+        height: 100px;
+    }
 }
