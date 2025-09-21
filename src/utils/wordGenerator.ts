@@ -28,10 +28,11 @@ export const generateContent = (mode: 'easy' | 'medium' | 'hard'): string => {
       // 3-4 letter words
       return easyWords[Math.floor(Math.random() * easyWords.length)];
     
-    case 'hard':
+    case 'hard': {
       // 5+ letter words
       const hardWordList = [...mediumWords, ...hardWords];
       return hardWordList[Math.floor(Math.random() * hardWordList.length)];
+    }
     
     default:
       return letters[Math.floor(Math.random() * letters.length)];

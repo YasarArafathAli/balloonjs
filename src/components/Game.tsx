@@ -32,7 +32,6 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   const modeRef = useRef(mode);
   const isPausedRef = useRef(isPaused);
   
-  const colors: CloudColor[] = ['yellow', 'red', 'blue', 'violet', 'green'];
 
   // Update refs when values change
   useEffect(() => {
@@ -45,6 +44,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
 
   // Reusable function to create cloud spawning intervals
   const createCloudInterval = useCallback((intervalMs: number, isDistraction: boolean = false) => {
+    const colors: CloudColor[] = ['yellow', 'red', 'blue', 'violet', 'green'];
     return setInterval(() => {
       if (!isPausedRef.current) {
         if (isDistraction) {
@@ -88,7 +88,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
         }
       }
     }, intervalMs);
-  }, [colors]);
+  }, []);
 
   // Function to create cloud spawning intervals based on game mode
   const createModeIntervals = useCallback(() => {
@@ -111,7 +111,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     intervals.push(createCloudInterval(1200, true)); // 1.2 seconds - very fast spawning
 
     return intervals;
-  }, [mode, createCloudInterval]);
+  }, [createCloudInterval, mode]);
 
 
 
@@ -245,7 +245,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     
     // Restart spawning with current mode using reusable function
     intervalsRef.current = createModeIntervals();
-  }, [mode, createModeIntervals]);
+  }, [createModeIntervals]);
 
   const handleGoHome = useCallback(() => {
     intervalsRef.current.forEach(interval => clearInterval(interval));
@@ -264,7 +264,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     return () => {
       intervalsRef.current.forEach(interval => clearInterval(interval));
     };
-  }, [mode, createModeIntervals]); // Run when mode changes
+  }, [createModeIntervals]); // Run when mode changes
 
 
   useEffect(() => {
