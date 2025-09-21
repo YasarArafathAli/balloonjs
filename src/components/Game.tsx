@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import Balloon from './Balloon';
+import Cloud from './Cloud';
 import GameOver from './GameOver';
-import type { BalloonColor, GameMode, BalloonContent } from '../types';
+import type { CloudColor, GameMode, CloudContent } from '../types';
 import { generateContent } from '../utils/wordGenerator';
 import { saveHighScore } from '../utils/highScore';
 import './Game.css';
 
-interface BalloonData {
+interface CloudData {
   id: number;
-  color: BalloonColor;
+  color: CloudColor;
   top: number;
-  content: BalloonContent;
+  content: CloudContent;
 }
 
 interface GameProps {
@@ -21,18 +21,18 @@ interface GameProps {
 const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   const [score, setScore] = useState(0);
   const [missed, setMissed] = useState(0);
-  const [balloons, setBalloons] = useState<BalloonData[]>([]);
+  const [clouds, setClouds] = useState<CloudData[]>([]);
   const [won, setWon] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   
-  const balloonIdRef = useRef(0);
+  const cloudIdRef = useRef(0);
   const intervalsRef = useRef<number[]>([]);
-  const processedMissedBalloons = useRef<Set<number>>(new Set());
+  const processedMissedClouds = useRef<Set<number>>(new Set());
   const modeRef = useRef(mode);
   const isPausedRef = useRef(isPaused);
   
-  const colors: BalloonColor[] = ['yellow', 'red', 'blue', 'violet', 'green'];
+  const colors: CloudColor[] = ['yellow', 'red', 'blue', 'violet', 'green'];
 
   // Update refs when values change
   useEffect(() => {
@@ -44,7 +44,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   }, [isPaused]);
 
   // Reusable function to create cloud spawning intervals
-  const createBalloonInterval = useCallback((intervalMs: number, isDistraction: boolean = false) => {
+  const createCloudInterval = useCallback((intervalMs: number, isDistraction: boolean = false) => {
     return setInterval(() => {
       if (!isPausedRef.current) {
         if (isDistraction) {
@@ -52,20 +52,20 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
           if (Math.random() < 0.6) {
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100); // Vertical position (0-100vh)
-            const content: BalloonContent = {
+            const content: CloudContent = {
               text: '',
               typedText: '',
               isCompleted: false,
               isDistraction: true
             };
-            setBalloons(prev => {
-              const newBalloon = {
-                id: balloonIdRef.current++,
+            setClouds(prev => {
+              const newCloud = {
+                id: cloudIdRef.current++,
                 color: randomColor,
                 top: randomPos,
                 content
               };
-              return [...prev, newBalloon];
+              return [...prev, newCloud];
             });
           }
         } else {
@@ -73,14 +73,14 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
           const randomColor = colors[Math.floor(Math.random() * colors.length)];
           const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100); // Vertical position (0-100vh)
           const text = generateContent(modeRef.current);
-          const content: BalloonContent = {
+          const content: CloudContent = {
             text,
             typedText: '',
             isCompleted: false,
             isDistraction: false
           };
-          setBalloons(prev => [...prev, {
-            id: balloonIdRef.current++,
+          setClouds(prev => [...prev, {
+            id: cloudIdRef.current++,
             color: randomColor,
             top: randomPos,
             content
@@ -95,57 +95,57 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     const intervals: number[] = [];
     
     if (mode === 'easy') {
-      intervals.push(createBalloonInterval(1200)); // 1.2 seconds - much faster spawning
-      intervals.push(createBalloonInterval(1800)); // 1.8 seconds - much faster spawning
+      intervals.push(createCloudInterval(1200)); // 1.2 seconds - much faster spawning
+      intervals.push(createCloudInterval(1800)); // 1.8 seconds - much faster spawning
     } else if (mode === 'medium') {
-      intervals.push(createBalloonInterval(1000)); // 1 second - much faster spawning
-      intervals.push(createBalloonInterval(1500)); // 1.5 seconds - much faster spawning
+      intervals.push(createCloudInterval(1000)); // 1 second - much faster spawning
+      intervals.push(createCloudInterval(1500)); // 1.5 seconds - much faster spawning
     } else { // hard mode
-      intervals.push(createBalloonInterval(800)); // 0.8 seconds - very fast spawning
-      intervals.push(createBalloonInterval(1200)); // 1.2 seconds - very fast spawning
-      intervals.push(createBalloonInterval(1500)); // 1.5 seconds - very fast spawning
+      intervals.push(createCloudInterval(800)); // 0.8 seconds - very fast spawning
+      intervals.push(createCloudInterval(1200)); // 1.2 seconds - very fast spawning
+      intervals.push(createCloudInterval(1500)); // 1.5 seconds - very fast spawning
     }
 
     // Add distraction cloud intervals
-    intervals.push(createBalloonInterval(800, true)); // 0.8 seconds - very fast spawning
-    intervals.push(createBalloonInterval(1200, true)); // 1.2 seconds - very fast spawning
+    intervals.push(createCloudInterval(800, true)); // 0.8 seconds - very fast spawning
+    intervals.push(createCloudInterval(1200, true)); // 1.2 seconds - very fast spawning
 
     return intervals;
-  }, [mode, createBalloonInterval]);
+  }, [mode, createCloudInterval]);
 
 
 
-  const handleBalloonPop = useCallback((id: number) => {
-    setBalloons(prev => prev.filter(balloon => balloon.id !== id));
+  const handleCloudPop = useCallback((id: number) => {
+    setClouds(prev => prev.filter(cloud => cloud.id !== id));
     setScore(prev => prev + 1);
   }, []);
 
-  const handleBalloonMiss = useCallback((id: number) => {
-    console.log('Balloon miss called for ID:', id);
+  const handleCloudMiss = useCallback((id: number) => {
+    console.log('Cloud miss called for ID:', id);
     
     // Use a more robust approach to prevent double counting
-    setBalloons(prev => {
-      // Check if we've already processed this balloon
-      if (processedMissedBalloons.current.has(id)) {
-        console.log('Balloon ID', id, 'already processed, skipping');
+    setClouds(prev => {
+      // Check if we've already processed this cloud
+      if (processedMissedClouds.current.has(id)) {
+        console.log('Cloud ID', id, 'already processed, skipping');
         return prev; // Return unchanged state
       }
       
-      const balloonIndex = prev.findIndex(b => b.id === id);
-      if (balloonIndex === -1) {
-        console.log('Balloon not found, already removed');
-        return prev; // Balloon already removed, don't count as missed
+      const cloudIndex = prev.findIndex(b => b.id === id);
+      if (cloudIndex === -1) {
+        console.log('Cloud not found, already removed');
+        return prev; // Cloud already removed, don't count as missed
       }
       
-      // Mark this balloon as processed BEFORE doing anything else
-      processedMissedBalloons.current.add(id);
+      // Mark this cloud as processed BEFORE doing anything else
+      processedMissedClouds.current.add(id);
       
-      const balloon = prev[balloonIndex];
-      const shouldCountAsMissed = balloon && !balloon.content.isDistraction;
+      const cloud = prev[cloudIndex];
+      const shouldCountAsMissed = cloud && !cloud.content.isDistraction;
       
-      console.log('Balloon found at index:', balloonIndex, 'Should count as missed:', shouldCountAsMissed);
+      console.log('Cloud found at index:', cloudIndex, 'Should count as missed:', shouldCountAsMissed);
       
-      // Update missed count if this balloon should count
+      // Update missed count if this cloud should count
       if (shouldCountAsMissed) {
         setMissed(prevMissed => {
           console.log('Updating missed count from', prevMissed, 'to', prevMissed + 1);
@@ -153,8 +153,8 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
         });
       }
       
-      // Remove the balloon from the array
-      return prev.filter(balloon => balloon.id !== id);
+      // Remove the cloud from the array
+      return prev.filter(cloud => cloud.id !== id);
     });
   }, []);
 
@@ -175,11 +175,11 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
 
     const key = event.key.toUpperCase();
     
-    // Update balloons with typed text (skip distraction balloons)
-    setBalloons(prev => prev.map(balloon => {
-      if (balloon.content.isCompleted || balloon.content.isDistraction) return balloon;
+    // Update clouds with typed text (skip distraction clouds)
+    setClouds(prev => prev.map(cloud => {
+      if (cloud.content.isCompleted || cloud.content.isDistraction) return cloud;
       
-      const { text, typedText } = balloon.content;
+      const { text, typedText } = cloud.content;
       const expectedChar = text[typedText.length];
       
       if (key === expectedChar) {
@@ -187,24 +187,24 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
         const isCompleted = newTypedText === text;
         
         if (isCompleted) {
-          // Pop the balloon after a short delay
+          // Pop the cloud after a short delay
           setTimeout(() => {
-            setBalloons(current => current.filter(b => b.id !== balloon.id));
+            setClouds(current => current.filter(b => b.id !== cloud.id));
             setScore(current => current + 1);
           }, 100);
         }
         
         return {
-          ...balloon,
+          ...cloud,
           content: {
-            ...balloon.content,
+            ...cloud.content,
             typedText: newTypedText,
             isCompleted
           }
         };
       }
       
-      return balloon;
+      return cloud;
     }));
   }, [isPaused, togglePause]);
 
@@ -223,7 +223,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     // Save high score
     saveHighScore(score, mode);
     
-    // Game only ends when missed balloons reach 5 (losing condition)
+    // Game only ends when missed clouds reach 5 (losing condition)
     // No winning condition based on score anymore
     setWon(false);
     setShowGameOver(true);
@@ -232,12 +232,12 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   const handleRestart = useCallback(() => {
     setScore(0);
     setMissed(0);
-    setBalloons([]);
+    setClouds([]);
     setWon(false);
     setShowGameOver(false);
     setIsPaused(false);
-    balloonIdRef.current = 0;
-    processedMissedBalloons.current.clear(); // Clear the processed balloons set
+    cloudIdRef.current = 0;
+    processedMissedClouds.current.clear(); // Clear the processed clouds set
     
     // Clear existing intervals
     intervalsRef.current.forEach(interval => clearInterval(interval));
@@ -284,17 +284,17 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
         </button>
       </div>
       
-      {balloons.map(balloon => (
-        <Balloon
-          key={balloon.id}
-          color={balloon.color}
-          top={balloon.top}
-          content={balloon.content}
-          onPop={() => handleBalloonPop(balloon.id)}
-          onMiss={() => handleBalloonMiss(balloon.id)}
+      {clouds.map(cloud => (
+        <Cloud
+          key={cloud.id}
+          color={cloud.color}
+          top={cloud.top}
+          content={cloud.content}
+          onPop={() => handleCloudPop(cloud.id)}
+          onMiss={() => handleCloudMiss(cloud.id)}
           isPaused={isPaused}
           gameMode={mode}
-          balloonId={balloon.id}
+          cloudId={cloud.id}
         />
       ))}
       

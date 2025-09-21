@@ -1,22 +1,21 @@
 import React, { useEffect, useRef } from 'react';
-import './Balloon.css';
-import type { BalloonColor, BalloonContent } from '../types';
+import './Cloud.css';
+import type { CloudColor, CloudContent } from '../types';
 
-interface BalloonProps {
-  color: BalloonColor;
+interface CloudProps {
+  color: CloudColor;
   top: number;
-  content: BalloonContent;
+  content: CloudContent;
   onPop: () => void;
   onMiss: () => void;
   isPaused: boolean;
   gameMode: 'easy' | 'medium' | 'hard';
-  balloonId: number;
+  cloudId: number;
 }
 
-const Balloon: React.FC<BalloonProps> = ({ color, top, content, onPop, onMiss, isPaused, gameMode, balloonId }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const Cloud: React.FC<CloudProps> = ({ color, top, content, onPop: _onPop, onMiss, isPaused, gameMode, cloudId }) => {
   // onPop is kept for interface compatibility but not used (typing-based gameplay)
-  const balloonRef = useRef<HTMLDivElement>(null);
+  const cloudRef = useRef<HTMLDivElement>(null);
   const onMissRef = useRef(onMiss);
 
   // Update the ref when onMiss changes
@@ -25,12 +24,12 @@ const Balloon: React.FC<BalloonProps> = ({ color, top, content, onPop, onMiss, i
   }, [onMiss]);
 
   useEffect(() => {
-    const balloon = balloonRef.current;
-    if (!balloon) return;
+    const cloud = cloudRef.current;
+    if (!cloud) return;
 
     let position = 100; // Start from right side (100vw)
     // Set initial position
-    balloon.style.left = `${position}vw`;
+    cloud.style.left = `${position}vw`;
     
     // Adjust speed based on game mode (much slower for clear word visibility)
     let baseSpeed = 0.2; // Much slower for clear reading
@@ -47,31 +46,31 @@ const Balloon: React.FC<BalloonProps> = ({ color, top, content, onPop, onMiss, i
       
       if (position <= -40) {
         clearInterval(animationInterval);
-        console.log('Cloud reached left edge, calling onMiss for cloud ID:', balloonId);
+        console.log('Cloud reached left edge, calling onMiss for cloud ID:', cloudId);
         onMissRef.current();
       } else {
         position -= randomSpeed;
-        balloon.style.left = `${position}vw`;
+        cloud.style.left = `${position}vw`;
       }
     }, 16); // ~60fps for smoother animation
 
     return () => clearInterval(animationInterval);
-  }, [isPaused, gameMode, balloonId]); // Add balloonId to dependency array
+  }, [isPaused, gameMode, cloudId]); // Add cloudId to dependency array
 
   return (
     <div
-      ref={balloonRef}
-      className={`balloon balloon-${color} ${content.isDistraction ? 'distraction' : ''}`}
+      ref={cloudRef}
+      className={`cloud cloud-${color} ${content.isDistraction ? 'distraction' : ''}`}
       style={{ top: `${top}vh` }}
     >
       {!content.isDistraction && (
-        <div className="balloon-text">
-          <div className="balloon-target">{content.text}</div>
-          <div className="balloon-typed">{content.typedText}</div>
+        <div className="cloud-text">
+          <div className="cloud-target">{content.text}</div>
+          <div className="cloud-typed">{content.typedText}</div>
         </div>
       )}
     </div>
   );
 };
 
-export default Balloon;
+export default Cloud;

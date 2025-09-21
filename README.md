@@ -1,14 +1,14 @@
-# Balloon Mania - Typing Game 🎈⌨️
+# Cloud Typer - Typing Game ☁️⌨️
 
-A fun typing game where you pop balloons by typing letters and words! Migrated from vanilla JavaScript to React 19 with Vite and transformed into an engaging typing experience.
+A fun typing game where you clear clouds by typing letters and words! Migrated from vanilla JavaScript to React 19 with Vite and transformed into an engaging typing experience.
 
 ## Features
 
 - **Three Difficulty Modes**: Easy (single letters), Medium (3-4 letter words), Hard (5+ letter words)
-- **Typing-Based Gameplay**: Type the exact letters/words displayed on balloons to pop them
-- **Real-time Balloon Spawning**: Balloons appear at random positions across the screen
+- **Typing-Based Gameplay**: Type the exact letters/words displayed on clouds to clear them
+- **Real-time Cloud Spawning**: Clouds appear at random positions across the screen
 - **Visual Typing Feedback**: See your progress as you type with highlighted text
-- **Score Tracking**: Track your score and missed balloons with visual warnings
+- **Score Tracking**: Track your score and missed clouds with visual warnings
 - **Beautiful Background**: Custom background image with enhanced UI contrast
 - **Responsive Design**: Works perfectly on mobile and desktop devices
 - **Modern React Architecture**: Built with React 19, TypeScript, and Vite
@@ -16,8 +16,8 @@ A fun typing game where you pop balloons by typing letters and words! Migrated f
 ## Game Rules
 
 ### How to Play
-- Type the letters or words displayed on balloons before they disappear
-- Complete the full text to pop the balloon and score points
+- Type the letters or words displayed on clouds before they disappear
+- Complete the full text to clear the cloud and score points
 - Use your keyboard to type - no clicking required!
 
 ### Difficulty Levels
@@ -26,8 +26,8 @@ A fun typing game where you pop balloons by typing letters and words! Migrated f
 - **Hard Mode**: 5+ letter words (HOUSE, LIGHT, ADVENTURE, etc.) - Score 10 points to win
 
 ### Game Over Conditions
-- Miss 5 balloons and you lose
-- Each completed balloon gives you 1 point
+- Miss 5 clouds and you lose
+- Each completed cloud gives you 1 point
 - Reach the target score to win!
 
 ## Technology Stack
@@ -64,8 +64,8 @@ npm run build
 ```
 src/
 ├── components/
-│   ├── Balloon.tsx      # Individual balloon component with text display
-│   ├── Balloon.css      # Balloon styles with text overlay
+│   ├── Cloud.tsx        # Individual cloud component with text display
+│   ├── Cloud.css        # Cloud styles with text overlay
 │   ├── Game.tsx         # Main game logic with keyboard input handling
 │   ├── Game.css         # Game container styles with background
 │   ├── GameOver.tsx     # Game over modal component
@@ -84,7 +84,7 @@ src/
 
 public/
 └── assets/
-    ├── images/          # Balloon images (red, blue, green, yellow, violet)
+    ├── images/          # Cloud images (cloud1, cloud2, cloud3, cloud4)
     └── sounds/          # Background music and sound effects
 ```
 
@@ -98,7 +98,7 @@ public/
 
 ### 🎨 Visual Enhancements
 - **Custom Background**: Beautiful background image with enhanced UI contrast
-- **Text Overlay System**: Clear text display on balloons with progress indicators
+- **Text Overlay System**: Clear text display on clouds with progress indicators
 - **Responsive Design**: Optimized for both mobile and desktop experiences
 - **Enhanced Typography**: Improved fonts and text shadows for better readability
 
@@ -121,21 +121,21 @@ The project showcases modern React development patterns:
 
 ## Game Mechanics
 
-### Balloon Spawning
-- **Random Positioning**: Balloons spawn at random horizontal positions (5%-90% of screen width)
+### Cloud Spawning
+- **Random Positioning**: Clouds spawn at random horizontal positions (5%-90% of screen width)
 - **Mode-Specific Timing**: Different spawn intervals for each difficulty level
-- **Smooth Animation**: Continuous upward movement with variable speeds
+- **Smooth Animation**: Continuous leftward movement with variable speeds
 
 ### Typing System
 - **Character-by-Character Matching**: Real-time validation of typed input
 - **Progress Tracking**: Visual feedback showing typed vs. target text
-- **Completion Detection**: Automatic balloon popping when text is complete
+- **Completion Detection**: Automatic cloud clearing when text is complete
 - **Error Handling**: Graceful handling of incorrect keystrokes
 
 ### Scoring System
-- **Point Accumulation**: 1 point per completed balloon
-- **Missed Balloon Tracking**: Visual counter with warning animations
-- **Win/Lose Conditions**: Target scores and missed balloon limits per mode
+- **Point Accumulation**: 1 point per completed cloud
+- **Missed Cloud Tracking**: Visual counter with warning animations
+- **Win/Lose Conditions**: Target scores and missed cloud limits per mode
 
 ## Contributing
 
