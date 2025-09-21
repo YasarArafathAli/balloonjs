@@ -26,11 +26,11 @@ const Home: React.FC<HomeProps> = ({ onStartGame, refreshTrigger }) => {
   return (
     <div className="home">
       <h1>
-        <span className="bal">Balloon</span> <span className="mania">Mania</span>
+        <span className="bal">Cloud</span> <span className="mania">Typer</span>
       </h1>
       <p>
-       Type the letters or words on the balloons before they vanish. 
-       Complete the text to pop the balloon and score points!
+       Type the letters or words on the clouds before they drift away. 
+       Complete the text to clear the cloud and score points!
       </p>
 
       <div className="high-scores">
@@ -63,13 +63,13 @@ const Home: React.FC<HomeProps> = ({ onStartGame, refreshTrigger }) => {
         </button>
       </div>
       
-      <div className="game-info">
+      {/* <div className="game-info">
         <div className="info controls">
           <h4>How To Play</h4>
           <hr />
           <p>
-            Type the letters or words on the balloons before they vanish. 
-            Complete the text to pop the balloon and score points!
+            Type the letters or words on the clouds before they drift away. 
+            Complete the text to clear the cloud and score points!
           </p>
         </div>
         <div className="info howtoplay">
@@ -78,10 +78,10 @@ const Home: React.FC<HomeProps> = ({ onStartGame, refreshTrigger }) => {
           <p>
             • Type letters/words using your keyboard<br/>
             • Press ESC to pause/resume<br/>
-            • Game ends when you miss 5 balloons
+            • Game ends when you miss 5 clouds
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -1,9 +1,9 @@
 .balloon {
-  width: 80px;
-  height: 160px;
+  width: 180px;
+  height: 120px;
   position: absolute;
-  top: 100vh;
-  background-size: cover;
+  right: 0;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
@@ -13,23 +13,23 @@
 }
 
 .balloon-red {
-  background-image: url('/assets/images/balloon-red.png');
+  background-image: url('/assets/images/cloud1.png');
 }
 
 .balloon-blue {
-  background-image: url('/assets/images/balloon-blue.png');
+  background-image: url('/assets/images/cloud2.png');
 }
 
 .balloon-green {
-  background-image: url('/assets/images/balloon-green.png');
+  background-image: url('/assets/images/cloud3.png');
 }
 
 .balloon-yellow {
-  background-image: url('/assets/images/balloon-yellow.png');
+  background-image: url('/assets/images/cloud4.png');
 }
 
 .balloon-violet {
-  background-image: url('/assets/images/balloon-fiolet.png');
+  background-image: url('/assets/images/cloud1.png');
 }
 
 .balloon-text {
@@ -62,8 +62,8 @@
 
 @media screen and (max-width: 768px) {
   .balloon {
-    width: 50px;
-    height: 100px;
+    width: 120px;
+    height: 75px;
   }
   
   .balloon-text {
@@ -81,7 +81,7 @@
   }
 }
 
-/* Distraction balloon styles */
+/* Distraction cloud styles */
 .balloon.distraction {
   opacity: 0.7;
   filter: brightness(0.8);

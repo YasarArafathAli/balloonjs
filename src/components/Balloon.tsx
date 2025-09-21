@@ -4,7 +4,7 @@ import type { BalloonColor, BalloonContent } from '../types';
 
 interface BalloonProps {
   color: BalloonColor;
-  left: number;
+  top: number;
   content: BalloonContent;
   onPop: () => void;
   onMiss: () => void;
@@ -13,7 +13,7 @@ interface BalloonProps {
   balloonId: number;
 }
 
-const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss, isPaused, gameMode, balloonId }) => {
+const Balloon: React.FC<BalloonProps> = ({ color, top, content, onPop, onMiss, isPaused, gameMode, balloonId }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   // onPop is kept for interface compatibility but not used (typing-based gameplay)
   const balloonRef = useRef<HTMLDivElement>(null);
@@ -28,37 +28,37 @@ const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss, 
     const balloon = balloonRef.current;
     if (!balloon) return;
 
-    let position = 100;
-    // Adjust speed based on game mode
-    let baseSpeed = 0.3;
+    let position = 100; // Start from right side (100vw)
+    // Adjust speed based on game mode (reduced by 30%)
+    let baseSpeed = 0.21; // 0.3 * 0.7 = 0.21
     if (gameMode === 'medium') {
-      baseSpeed = 0.35;
+      baseSpeed = 0.245; // 0.35 * 0.7 = 0.245
     } else if (gameMode === 'hard') {
-      baseSpeed = 0.45; // Faster balloons in hard mode
+      baseSpeed = 0.315; // 0.45 * 0.7 = 0.315 (Faster movement in hard mode)
     }
-    const randomSpeed = Math.random() * 0.3 + baseSpeed;
+    const randomSpeed = Math.random() * 0.21 + baseSpeed; // 0.3 * 0.7 = 0.21
     const animationInterval = setInterval(() => {
-      // Don't move balloon or trigger miss when paused
+      // Don't move cloud or trigger miss when paused
       if (isPaused) return;
       
       if (position <= -40) {
         clearInterval(animationInterval);
-        console.log('Balloon reached top, calling onMiss for balloon ID:', balloonId);
+        console.log('Cloud reached left edge, calling onMiss for cloud ID:', balloonId);
         onMissRef.current();
       } else {
         position -= randomSpeed;
-        balloon.style.top = `${position}vh`;
+        balloon.style.left = `${position}vw`;
       }
     }, 10);
 
     return () => clearInterval(animationInterval);
-  }, [isPaused, gameMode]); // Add isPaused and gameMode to dependency array
+  }, [isPaused, gameMode, balloonId]); // Add balloonId to dependency array
 
   return (
     <div
       ref={balloonRef}
       className={`balloon balloon-${color} ${content.isDistraction ? 'distraction' : ''}`}
-      style={{ left: `${left}vw` }}
+      style={{ top: `${top}vh` }}
     >
       {!content.isDistraction && (
         <div className="balloon-text">

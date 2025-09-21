@@ -9,7 +9,7 @@ import './Game.css';
 interface BalloonData {
   id: number;
   color: BalloonColor;
-  left: number;
+  top: number;
   content: BalloonContent;
 }
 
@@ -43,15 +43,15 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
 
-  // Reusable function to create balloon spawning intervals
+  // Reusable function to create cloud spawning intervals
   const createBalloonInterval = useCallback((intervalMs: number, isDistraction: boolean = false) => {
     return setInterval(() => {
       if (!isPausedRef.current) {
         if (isDistraction) {
-          // Distraction balloon logic
+          // Distraction cloud logic
           if (Math.random() < 0.6) {
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+            const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100); // Vertical position (0-100vh)
             const content: BalloonContent = {
               text: '',
               typedText: '',
@@ -62,16 +62,16 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
               const newBalloon = {
                 id: balloonIdRef.current++,
                 color: randomColor,
-                left: randomPos,
+                top: randomPos,
                 content
               };
               return [...prev, newBalloon];
             });
           }
         } else {
-          // Regular balloon logic
+          // Regular cloud logic
           const randomColor = colors[Math.floor(Math.random() * colors.length)];
-          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100); // Vertical position (0-100vh)
           const text = generateContent(modeRef.current);
           const content: BalloonContent = {
             text,
@@ -82,7 +82,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
           setBalloons(prev => [...prev, {
             id: balloonIdRef.current++,
             color: randomColor,
-            left: randomPos,
+            top: randomPos,
             content
           }]);
         }
@@ -90,7 +90,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     }, intervalMs);
   }, [colors]);
 
-  // Function to create intervals based on game mode
+  // Function to create cloud spawning intervals based on game mode
   const createModeIntervals = useCallback(() => {
     const intervals: number[] = [];
     
@@ -106,7 +106,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
       intervals.push(createBalloonInterval(2800)); // 2.8 seconds
     }
 
-    // Add distraction balloon intervals
+    // Add distraction cloud intervals
     intervals.push(createBalloonInterval(1500, true)); // 1.5 seconds
     intervals.push(createBalloonInterval(2500, true)); // 2.5 seconds
 
@@ -288,7 +288,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
         <Balloon
           key={balloon.id}
           color={balloon.color}
-          left={balloon.left}
+          top={balloon.top}
           content={balloon.content}
           onPop={() => handleBalloonPop(balloon.id)}
           onMiss={() => handleBalloonMiss(balloon.id)}
