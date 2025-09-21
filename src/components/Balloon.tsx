@@ -9,9 +9,11 @@ interface BalloonProps {
   onPop: () => void;
   onMiss: () => void;
   isPaused: boolean;
+  gameMode: 'easy' | 'medium' | 'hard';
+  balloonId: number;
 }
 
-const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss, isPaused }) => {
+const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss, isPaused, gameMode, balloonId }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   // onPop is kept for interface compatibility but not used (typing-based gameplay)
   const balloonRef = useRef<HTMLDivElement>(null);
@@ -27,13 +29,21 @@ const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss, 
     if (!balloon) return;
 
     let position = 100;
-    const randomSpeed = Math.random() * 0.3 + 0.3;
+    // Adjust speed based on game mode
+    let baseSpeed = 0.3;
+    if (gameMode === 'medium') {
+      baseSpeed = 0.35;
+    } else if (gameMode === 'hard') {
+      baseSpeed = 0.45; // Faster balloons in hard mode
+    }
+    const randomSpeed = Math.random() * 0.3 + baseSpeed;
     const animationInterval = setInterval(() => {
       // Don't move balloon or trigger miss when paused
       if (isPaused) return;
       
       if (position <= -40) {
         clearInterval(animationInterval);
+        console.log('Balloon reached top, calling onMiss for balloon ID:', balloonId);
         onMissRef.current();
       } else {
         position -= randomSpeed;
@@ -42,7 +52,7 @@ const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss, 
     }, 10);
 
     return () => clearInterval(animationInterval);
-  }, [isPaused]); // Add isPaused to dependency array
+  }, [isPaused, gameMode]); // Add isPaused and gameMode to dependency array
 
   return (
     <div
