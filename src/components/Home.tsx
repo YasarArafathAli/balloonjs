@@ -33,6 +33,18 @@ const Home: React.FC<HomeProps> = ({ onStartGame, refreshTrigger }) => {
        Complete the text to clear the cloud and score points!
       </p>
 
+    
+      <div className="btns">
+        <button className="btn" onClick={() => onStartGame('easy')}>
+          Easy - Single Letters
+        </button>
+        <button className="btn" onClick={() => onStartGame('medium')}>
+          Medium - 3-4 Letter Words
+        </button>
+        <button className="btn" onClick={() => onStartGame('hard')}>
+          Hard - 5+ Letter Words
+        </button>
+      </div>
       <div className="high-scores">
         <h3>High Scores</h3>
         <div className="score-board">
@@ -51,18 +63,6 @@ const Home: React.FC<HomeProps> = ({ onStartGame, refreshTrigger }) => {
         </div>
       </div>
 
-      <div className="btns">
-        <button className="btn" onClick={() => onStartGame('easy')}>
-          Easy - Single Letters
-        </button>
-        <button className="btn" onClick={() => onStartGame('medium')}>
-          Medium - 3-4 Letter Words
-        </button>
-        <button className="btn" onClick={() => onStartGame('hard')}>
-          Hard - 5+ Letter Words
-        </button>
-      </div>
-      
       {/* <div className="game-info">
         <div className="info controls">
           <h4>How To Play</h4>

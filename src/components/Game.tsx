@@ -95,20 +95,20 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     const intervals: number[] = [];
     
     if (mode === 'easy') {
-      intervals.push(createBalloonInterval(3000)); // 3 seconds
-      intervals.push(createBalloonInterval(4000)); // 4 seconds
+      intervals.push(createBalloonInterval(1200)); // 1.2 seconds - much faster spawning
+      intervals.push(createBalloonInterval(1800)); // 1.8 seconds - much faster spawning
     } else if (mode === 'medium') {
-      intervals.push(createBalloonInterval(2500)); // 2.5 seconds
-      intervals.push(createBalloonInterval(3500)); // 3.5 seconds
+      intervals.push(createBalloonInterval(1000)); // 1 second - much faster spawning
+      intervals.push(createBalloonInterval(1500)); // 1.5 seconds - much faster spawning
     } else { // hard mode
-      intervals.push(createBalloonInterval(1800)); // 1.8 seconds
-      intervals.push(createBalloonInterval(2200)); // 2.2 seconds
-      intervals.push(createBalloonInterval(2800)); // 2.8 seconds
+      intervals.push(createBalloonInterval(800)); // 0.8 seconds - very fast spawning
+      intervals.push(createBalloonInterval(1200)); // 1.2 seconds - very fast spawning
+      intervals.push(createBalloonInterval(1500)); // 1.5 seconds - very fast spawning
     }
 
     // Add distraction cloud intervals
-    intervals.push(createBalloonInterval(1500, true)); // 1.5 seconds
-    intervals.push(createBalloonInterval(2500, true)); // 2.5 seconds
+    intervals.push(createBalloonInterval(800, true)); // 0.8 seconds - very fast spawning
+    intervals.push(createBalloonInterval(1200, true)); // 1.2 seconds - very fast spawning
 
     return intervals;
   }, [mode, createBalloonInterval]);

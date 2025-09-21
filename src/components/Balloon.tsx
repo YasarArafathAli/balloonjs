@@ -29,14 +29,18 @@ const Balloon: React.FC<BalloonProps> = ({ color, top, content, onPop, onMiss, i
     if (!balloon) return;
 
     let position = 100; // Start from right side (100vw)
-    // Adjust speed based on game mode (reduced by 30%)
-    let baseSpeed = 0.21; // 0.3 * 0.7 = 0.21
+    // Set initial position
+    balloon.style.left = `${position}vw`;
+    
+    // Adjust speed based on game mode (much slower for clear word visibility)
+    let baseSpeed = 0.2; // Much slower for clear reading
     if (gameMode === 'medium') {
-      baseSpeed = 0.245; // 0.35 * 0.7 = 0.245
+      baseSpeed = 0.25;
     } else if (gameMode === 'hard') {
-      baseSpeed = 0.315; // 0.45 * 0.7 = 0.315 (Faster movement in hard mode)
+      baseSpeed = 0.3; // Slightly faster in hard mode
     }
-    const randomSpeed = Math.random() * 0.21 + baseSpeed; // 0.3 * 0.7 = 0.21
+    const randomSpeed = Math.random() * 0.05 + baseSpeed; // Minimal variation
+    
     const animationInterval = setInterval(() => {
       // Don't move cloud or trigger miss when paused
       if (isPaused) return;
@@ -49,7 +53,7 @@ const Balloon: React.FC<BalloonProps> = ({ color, top, content, onPop, onMiss, i
         position -= randomSpeed;
         balloon.style.left = `${position}vw`;
       }
-    }, 10);
+    }, 16); // ~60fps for smoother animation
 
     return () => clearInterval(animationInterval);
   }, [isPaused, gameMode, balloonId]); // Add balloonId to dependency array
