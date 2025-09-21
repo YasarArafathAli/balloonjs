@@ -3,6 +3,7 @@ import Balloon from './Balloon';
 import GameOver from './GameOver';
 import type { BalloonColor, GameMode, BalloonContent } from '../types';
 import { generateContent } from '../utils/wordGenerator';
+import { saveHighScore } from '../utils/highScore';
 import './Game.css';
 
 interface BalloonData {
@@ -23,14 +24,16 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   const [balloons, setBalloons] = useState<BalloonData[]>([]);
   const [won, setWon] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   
   const balloonIdRef = useRef(0);
   const intervalsRef = useRef<number[]>([]);
   
   const colors: BalloonColor[] = ['yellow', 'red', 'blue', 'violet', 'green'];
-  const targetScore = mode === 'easy' ? 20 : mode === 'medium' ? 15 : 10;
 
   const createBalloon = useCallback(() => {
+    if (isPaused) return; // Don't create balloons when paused
+    
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     
     // Generate random position with better distribution across screen
@@ -38,19 +41,36 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     // This ensures balloons are well distributed and don't clip at screen edges
     const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
     
-    const text = generateContent(mode);
+    // 20% chance of creating a distraction balloon
+    const isDistraction = Math.random() < 0.2;
+    
+    let content: BalloonContent;
+    if (isDistraction) {
+      // Distraction balloon - empty, no text
+      content = {
+        text: '',
+        typedText: '',
+        isCompleted: false,
+        isDistraction: true
+      };
+    } else {
+      // Regular balloon with text
+      const text = generateContent(mode);
+      content = {
+        text,
+        typedText: '',
+        isCompleted: false,
+        isDistraction: false
+      };
+    }
     
     setBalloons(prev => [...prev, {
       id: balloonIdRef.current++,
       color: randomColor,
       left: randomPos,
-      content: {
-        text,
-        typedText: '',
-        isCompleted: false
-      }
+      content
     }]);
-  }, [colors, mode]);
+  }, [colors, mode, isPaused]);
 
   const startBalloonSpawning = useCallback(() => {
     // Clear any existing intervals
@@ -75,17 +95,36 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   }, []);
 
   const handleBalloonMiss = useCallback((id: number) => {
-    setBalloons(prev => prev.filter(balloon => balloon.id !== id));
-    setMissed(prev => prev + 1);
+    setBalloons(prev => {
+      const balloon = prev.find(b => b.id === id);
+      // Check if it's a distraction balloon and update missed count accordingly
+      if (balloon && !balloon.content.isDistraction) {
+        setMissed(prev => prev + 1);
+      }
+      return prev.filter(balloon => balloon.id !== id);
+    });
+  }, []);
+
+  const togglePause = useCallback(() => {
+    setIsPaused(prev => !prev);
   }, []);
 
   // Handle keyboard input
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
+    // Handle ESC key for pause/resume
+    if (event.key === 'Escape') {
+      togglePause();
+      return;
+    }
+
+    // Don't process typing when paused
+    if (isPaused) return;
+
     const key = event.key.toUpperCase();
     
-    // Update balloons with typed text
+    // Update balloons with typed text (skip distraction balloons)
     setBalloons(prev => prev.map(balloon => {
-      if (balloon.content.isCompleted) return balloon;
+      if (balloon.content.isCompleted || balloon.content.isDistraction) return balloon;
       
       const { text, typedText } = balloon.content;
       const expectedChar = text[typedText.length];
@@ -114,7 +153,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
       
       return balloon;
     }));
-  }, []);
+  }, [isPaused, togglePause]);
 
   // Add keyboard event listener
   useEffect(() => {
@@ -128,13 +167,14 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     intervalsRef.current.forEach(interval => clearInterval(interval));
     intervalsRef.current = [];
     
-    if (score >= targetScore) {
-      setWon(true);
-    } else {
-      setWon(false);
-    }
+    // Save high score
+    saveHighScore(score, mode);
+    
+    // Game only ends when missed balloons reach 5 (losing condition)
+    // No winning condition based on score anymore
+    setWon(false);
     setShowGameOver(true);
-  }, [score, targetScore]);
+  }, [score, mode]);
 
   const handleRestart = useCallback(() => {
     setScore(0);
@@ -142,6 +182,7 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     setBalloons([]);
     setWon(false);
     setShowGameOver(false);
+    setIsPaused(false);
     balloonIdRef.current = 0;
     startBalloonSpawning();
   }, [startBalloonSpawning]);
@@ -157,16 +198,20 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   }, [startBalloonSpawning]);
 
   useEffect(() => {
-    if (missed > 5 || score >= targetScore) {
+    if (missed >= 5) {
       endGame();
     }
-  }, [missed, score, targetScore, endGame]);
+  }, [missed, endGame]);
 
   return (
     <div className="game-container">
       <div className="score">
         <p>Your score is <span>{score}</span></p>
         <p>Missed: <span className={missed >= 3 ? 'warning' : ''}>{missed}</span>/5</p>
+        {isPaused && <p className="pause-indicator">PAUSED</p>}
+        <button className="exit-btn" onClick={handleGoHome}>
+          ← Exit
+        </button>
       </div>
       
       {balloons.map(balloon => (
@@ -177,8 +222,18 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
           content={balloon.content}
           onPop={() => handleBalloonPop(balloon.id)}
           onMiss={() => handleBalloonMiss(balloon.id)}
+          isPaused={isPaused}
         />
       ))}
+      
+      {isPaused && (
+        <div className="pause-overlay">
+          <div className="pause-message">
+            <h2>GAME PAUSED</h2>
+            <p>Press ESC to resume</p>
+          </div>
+        </div>
+      )}
       
       <GameOver
         isVisible={showGameOver}

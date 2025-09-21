@@ -80,3 +80,13 @@
     font-size: 8px;
   }
 }
+
+/* Distraction balloon styles */
+.balloon.distraction {
+  opacity: 0.7;
+  filter: brightness(0.8);
+}
+
+.balloon.distraction:hover {
+  opacity: 0.8;
+}

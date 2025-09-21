@@ -8,11 +8,12 @@ interface BalloonProps {
   content: BalloonContent;
   onPop: () => void;
   onMiss: () => void;
+  isPaused: boolean;
 }
 
-const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss }) => {
-  // onPop is kept for interface compatibility but not used (typing-based gameplay)
+const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss, isPaused }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // onPop is kept for interface compatibility but not used (typing-based gameplay)
   const balloonRef = useRef<HTMLDivElement>(null);
   const onMissRef = useRef(onMiss);
 
@@ -28,6 +29,9 @@ const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss }
     let position = 100;
     const randomSpeed = Math.random() * 0.3 + 0.3;
     const animationInterval = setInterval(() => {
+      // Don't move balloon or trigger miss when paused
+      if (isPaused) return;
+      
       if (position <= -40) {
         clearInterval(animationInterval);
         onMissRef.current();
@@ -38,18 +42,20 @@ const Balloon: React.FC<BalloonProps> = ({ color, left, content, onPop, onMiss }
     }, 10);
 
     return () => clearInterval(animationInterval);
-  }, []); // Empty dependency array - animation only runs once
+  }, [isPaused]); // Add isPaused to dependency array
 
   return (
     <div
       ref={balloonRef}
-      className={`balloon balloon-${color}`}
+      className={`balloon balloon-${color} ${content.isDistraction ? 'distraction' : ''}`}
       style={{ left: `${left}vw` }}
     >
-      <div className="balloon-text">
-        <div className="balloon-target">{content.text}</div>
-        <div className="balloon-typed">{content.typedText}</div>
-      </div>
+      {!content.isDistraction && (
+        <div className="balloon-text">
+          <div className="balloon-target">{content.text}</div>
+          <div className="balloon-typed">{content.typedText}</div>
+        </div>
+      )}
     </div>
   );
 };

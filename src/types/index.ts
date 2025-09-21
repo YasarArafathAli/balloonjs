@@ -5,4 +5,5 @@ export interface BalloonContent {
   text: string;
   typedText: string;
   isCompleted: boolean;
+  isDistraction?: boolean; // True for distraction balloons that don't count
 }

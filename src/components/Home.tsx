@@ -1,11 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getHighScoreForMode } from '../utils/highScore';
 import './Home.css';
 
 interface HomeProps {
   onStartGame: (mode: 'easy' | 'medium' | 'hard') => void;
+  refreshTrigger?: number; // Used to trigger high score refresh
 }
 
-const Home: React.FC<HomeProps> = ({ onStartGame }) => {
+const Home: React.FC<HomeProps> = ({ onStartGame, refreshTrigger }) => {
+  const [highScores, setHighScores] = useState({
+    easy: 0,
+    medium: 0,
+    hard: 0
+  });
+
+  useEffect(() => {
+    // Load high scores when component mounts or refreshTrigger changes
+    setHighScores({
+      easy: getHighScoreForMode('easy'),
+      medium: getHighScoreForMode('medium'),
+      hard: getHighScoreForMode('hard')
+    });
+  }, [refreshTrigger]);
+
   return (
     <div className="home">
       <h1>
@@ -15,6 +32,24 @@ const Home: React.FC<HomeProps> = ({ onStartGame }) => {
        Type the letters or words on the balloons before they vanish. 
        Complete the text to pop the balloon and score points!
       </p>
+
+      <div className="high-scores">
+        <h3>High Scores</h3>
+        <div className="score-board">
+          <div className="score-item">
+            <span className="mode">Easy:</span>
+            <span className="highscore">{highScores.easy}</span>
+          </div>
+          <div className="score-item">
+            <span className="mode">Medium:</span>
+            <span className="highscore">{highScores.medium}</span>
+          </div>
+          <div className="score-item">
+            <span className="mode">Hard:</span>
+            <span className="highscore">{highScores.hard}</span>
+          </div>
+        </div>
+      </div>
 
       <div className="btns">
         <button className="btn" onClick={() => onStartGame('easy')}>
@@ -30,7 +65,7 @@ const Home: React.FC<HomeProps> = ({ onStartGame }) => {
       
       <div className="game-info">
         <div className="info controls">
-          <h4>How To play</h4>
+          <h4>How To Play</h4>
           <hr />
           <p>
             Type the letters or words on the balloons before they vanish. 
@@ -40,7 +75,11 @@ const Home: React.FC<HomeProps> = ({ onStartGame }) => {
         <div className="info howtoplay">
           <h4>Controls</h4>
           <hr />
-          <p>Type the letters/words on the balloons using your keyboard.</p>
+          <p>
+            • Type letters/words using your keyboard<br/>
+            • Press ESC to pause/resume<br/>
+            • Game ends when you miss 5 balloons
+          </p>
         </div>
       </div>
     </div>

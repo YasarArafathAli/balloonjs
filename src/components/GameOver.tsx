@@ -22,13 +22,13 @@ const GameOver: React.FC<GameOverProps> = ({
     <div className="shadow">
       <div className="block">
         <div className={`wrapper ${won ? 'win' : 'lose'}`}>
-          <h4>{won ? 'Congratulations!' : 'Good work!'}</h4>
+          <h4>Game Over!</h4>
           <img 
             src={won ? '/assets/images/happy.png' : '/assets/images/sad.png'} 
             alt={won ? 'happy' : 'sad'} 
           />
           <h4>Your score is <span>{score}</span></h4>
-          <p>playagain</p>
+          <p>Try to beat your high score!</p>
           <button className="btn restart" onClick={onRestart}>
             Restart
           </button>
