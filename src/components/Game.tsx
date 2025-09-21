@@ -29,97 +29,21 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   const balloonIdRef = useRef(0);
   const intervalsRef = useRef<number[]>([]);
   const processedMissedBalloons = useRef<Set<number>>(new Set());
+  const modeRef = useRef(mode);
+  const isPausedRef = useRef(isPaused);
   
   const colors: BalloonColor[] = ['yellow', 'red', 'blue', 'violet', 'green'];
 
-  const createRegularBalloon = useCallback(() => {
-    if (isPaused) return; // Don't create balloons when paused
-    
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    
-    // Generate random position with better distribution across screen
-    // Using Math.random() * 0.85 + 0.05 to get positions from 5% to 90%
-    // This ensures balloons are well distributed and don't clip at screen edges
-    const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
-    
-    // Regular balloon with text
-    const text = generateContent(mode);
-    const content: BalloonContent = {
-      text,
-      typedText: '',
-      isCompleted: false,
-      isDistraction: false
-    };
-    
-    setBalloons(prev => [...prev, {
-      id: balloonIdRef.current++,
-      color: randomColor,
-      left: randomPos,
-      content
-    }]);
-  }, [colors, mode, isPaused]);
+  // Update refs when values change
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
-  const createDistractionBalloon = useCallback(() => {
-    if (isPaused) return; // Don't create balloons when paused
-    
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    
-    // Generate random position with better distribution across screen
-    const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
-    
-    // Distraction balloon - empty, no text
-    const content: BalloonContent = {
-      text: '',
-      typedText: '',
-      isCompleted: false,
-      isDistraction: true
-    };
-    
-    console.log('Creating distraction balloon:', { randomColor, randomPos, content });
-    
-    setBalloons(prev => [...prev, {
-      id: balloonIdRef.current++,
-      color: randomColor,
-      left: randomPos,
-      content
-    }]);
-  }, [colors, isPaused]);
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
-  const startBalloonSpawning = useCallback(() => {
-    // Clear any existing intervals
-    intervalsRef.current.forEach(interval => clearInterval(interval));
-    intervalsRef.current = [];
 
-    // Regular balloon spawning intervals
-    if (mode === 'easy') {
-      const interval1 = setInterval(createRegularBalloon, 2000);
-      intervalsRef.current = [interval1];
-    } else if (mode === 'medium') {
-      const interval1 = setInterval(createRegularBalloon, 2500);
-      intervalsRef.current = [interval1];
-    } else {
-      // Hard mode: faster spawning and overlapping balloons
-      const interval1 = setInterval(createRegularBalloon, 1500); // Reduced from 3000ms to 1500ms
-      const interval2 = setInterval(createRegularBalloon, 2000); // Additional interval for overlapping balloons
-      intervalsRef.current = [interval1, interval2];
-    }
-
-    // Independent distraction balloon spawning
-    // Distraction balloons spawn every 3 seconds with random chance
-    const distractionInterval = setInterval(() => {
-      console.log('Distraction balloon check - random number:', Math.random());
-      // 100% chance to spawn a distraction balloon each check (for testing)
-      if (Math.random() < 1.0) {
-        console.log('Spawning distraction balloon!');
-        createDistractionBalloon();
-      } else {
-        console.log('No distraction balloon this time');
-      }
-    }, 3000);
-    intervalsRef.current.push(distractionInterval);
-    
-    console.log('Started distraction balloon spawning (30% chance every 3 seconds)');
-  }, [mode, createRegularBalloon, createDistractionBalloon]);
 
   const handleBalloonPop = useCallback((id: number) => {
     setBalloons(prev => prev.filter(balloon => balloon.id !== id));
@@ -244,8 +168,211 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
     setIsPaused(false);
     balloonIdRef.current = 0;
     processedMissedBalloons.current.clear(); // Clear the processed balloons set
-    startBalloonSpawning();
-  }, [startBalloonSpawning]);
+    
+    // Clear existing intervals
+    intervalsRef.current.forEach(interval => clearInterval(interval));
+    intervalsRef.current = [];
+    
+    // Restart spawning with current mode (same logic as in useEffect)
+    if (mode === 'easy') {
+      const interval1 = setInterval(() => {
+        if (!isPausedRef.current) {
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const text = generateContent(modeRef.current);
+          const content: BalloonContent = {
+            text,
+            typedText: '',
+            isCompleted: false,
+            isDistraction: false
+          };
+          setBalloons(prev => [...prev, {
+            id: balloonIdRef.current++,
+            color: randomColor,
+            left: randomPos,
+            content
+          }]);
+        }
+      }, 3000);
+      const interval2 = setInterval(() => {
+        if (!isPausedRef.current) {
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const text = generateContent(modeRef.current);
+          const content: BalloonContent = {
+            text,
+            typedText: '',
+            isCompleted: false,
+            isDistraction: false
+          };
+          setBalloons(prev => [...prev, {
+            id: balloonIdRef.current++,
+            color: randomColor,
+            left: randomPos,
+            content
+          }]);
+        }
+      }, 4000);
+      intervalsRef.current.push(interval1, interval2);
+    } else if (mode === 'medium') {
+      const interval1 = setInterval(() => {
+            if (!isPausedRef.current) {
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const text = generateContent(modeRef.current);
+          const content: BalloonContent = {
+            text,
+            typedText: '',
+            isCompleted: false,
+            isDistraction: false
+          };
+          setBalloons(prev => [...prev, {
+            id: balloonIdRef.current++,
+            color: randomColor,
+            left: randomPos,
+            content
+          }]);
+        }
+      }, 2500);
+      const interval2 = setInterval(() => {
+            if (!isPausedRef.current) {
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const text = generateContent(modeRef.current);
+          const content: BalloonContent = {
+            text,
+            typedText: '',
+            isCompleted: false,
+            isDistraction: false
+          };
+          setBalloons(prev => [...prev, {
+            id: balloonIdRef.current++,
+            color: randomColor,
+            left: randomPos,
+            content
+          }]);
+        }
+      }, 3500);
+      intervalsRef.current.push(interval1, interval2);
+    } else {
+      // Hard mode: faster spawning and overlapping balloons
+      const interval1 = setInterval(() => {
+            if (!isPausedRef.current) {
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const text = generateContent(modeRef.current);
+          const content: BalloonContent = {
+            text,
+            typedText: '',
+            isCompleted: false,
+            isDistraction: false
+          };
+          setBalloons(prev => [...prev, {
+            id: balloonIdRef.current++,
+            color: randomColor,
+            left: randomPos,
+            content
+          }]);
+        }
+      }, 1800);
+      const interval2 = setInterval(() => {
+            if (!isPausedRef.current) {
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const text = generateContent(modeRef.current);
+          const content: BalloonContent = {
+            text,
+            typedText: '',
+            isCompleted: false,
+            isDistraction: false
+          };
+          setBalloons(prev => [...prev, {
+            id: balloonIdRef.current++,
+            color: randomColor,
+            left: randomPos,
+            content
+          }]);
+        }
+      }, 2200);
+      const interval3 = setInterval(() => {
+            if (!isPausedRef.current) {
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const text = generateContent(modeRef.current);
+          const content: BalloonContent = {
+            text,
+            typedText: '',
+            isCompleted: false,
+            isDistraction: false
+          };
+          setBalloons(prev => [...prev, {
+            id: balloonIdRef.current++,
+            color: randomColor,
+            left: randomPos,
+            content
+          }]);
+        }
+      }, 2800);
+      intervalsRef.current.push(interval1, interval2, interval3);
+    }
+
+    // Independent distraction balloon spawning - multiple intervals for more balloons
+    const distractionInterval1 = setInterval(() => {
+      console.log('Distraction balloon check 1 - random number:', Math.random());
+      if (!isPaused && Math.random() < 0.6) {
+        console.log('Spawning distraction balloon 1!');
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+        const content: BalloonContent = {
+          text: '',
+          typedText: '',
+          isCompleted: false,
+          isDistraction: true
+        };
+        setBalloons(prev => {
+          const newBalloon = {
+            id: balloonIdRef.current++,
+            color: randomColor,
+            left: randomPos,
+            content
+          };
+          console.log('Adding distraction balloon to state:', newBalloon);
+          return [...prev, newBalloon];
+        });
+      }
+    }, 1500);
+    
+    const distractionInterval2 = setInterval(() => {
+      console.log('Distraction balloon check 2 - random number:', Math.random());
+      if (!isPaused && Math.random() < 0.6) {
+        console.log('Spawning distraction balloon 2!');
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+        const content: BalloonContent = {
+          text: '',
+          typedText: '',
+          isCompleted: false,
+          isDistraction: true
+        };
+        setBalloons(prev => {
+          const newBalloon = {
+            id: balloonIdRef.current++,
+            color: randomColor,
+            left: randomPos,
+            content
+          };
+          console.log('Adding distraction balloon to state:', newBalloon);
+          return [...prev, newBalloon];
+        });
+      }
+    }, 2500);
+    
+    intervalsRef.current.push(distractionInterval1, distractionInterval2);
+    
+    console.log('Started distraction balloon spawning (60% chance every 1.5s and 2.5s)');
+    console.log('Total intervals created:', intervalsRef.current.length);
+    console.log('Distraction intervals:', [distractionInterval1, distractionInterval2]);
+  }, [mode, isPaused]);
 
   const handleGoHome = useCallback(() => {
     intervalsRef.current.forEach(interval => clearInterval(interval));
@@ -254,11 +381,219 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   }, [onGameEnd]);
 
   useEffect(() => {
-    startBalloonSpawning();
+    console.log('useEffect triggered for mode:', mode);
+    // Always clear existing intervals first
+    intervalsRef.current.forEach(interval => clearInterval(interval));
+    intervalsRef.current = [];
+    
+    console.log('Starting balloon spawning for mode:', mode);
+      
+      // Start spawning with current mode
+      if (mode === 'easy') {
+        const interval1 = setInterval(() => {
+          console.log('Regular balloon interval 1 triggered, isPaused:', isPausedRef.current);
+          if (!isPausedRef.current) {
+            console.log('Creating regular balloon 1');
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+            const text = generateContent(modeRef.current);
+            const content: BalloonContent = {
+              text,
+              typedText: '',
+              isCompleted: false,
+              isDistraction: false
+            };
+            setBalloons(prev => [...prev, {
+              id: balloonIdRef.current++,
+              color: randomColor,
+              left: randomPos,
+              content
+            }]);
+          }
+        }, 3000);
+        const interval2 = setInterval(() => {
+            if (!isPausedRef.current) {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+            const text = generateContent(modeRef.current);
+            const content: BalloonContent = {
+              text,
+              typedText: '',
+              isCompleted: false,
+              isDistraction: false
+            };
+            setBalloons(prev => [...prev, {
+              id: balloonIdRef.current++,
+              color: randomColor,
+              left: randomPos,
+              content
+            }]);
+          }
+        }, 4000);
+        intervalsRef.current.push(interval1, interval2);
+      } else if (mode === 'medium') {
+        const interval1 = setInterval(() => {
+            if (!isPausedRef.current) {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+            const text = generateContent(modeRef.current);
+            const content: BalloonContent = {
+              text,
+              typedText: '',
+              isCompleted: false,
+              isDistraction: false
+            };
+            setBalloons(prev => [...prev, {
+              id: balloonIdRef.current++,
+              color: randomColor,
+              left: randomPos,
+              content
+            }]);
+          }
+        }, 2500);
+        const interval2 = setInterval(() => {
+            if (!isPausedRef.current) {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+            const text = generateContent(modeRef.current);
+            const content: BalloonContent = {
+              text,
+              typedText: '',
+              isCompleted: false,
+              isDistraction: false
+            };
+            setBalloons(prev => [...prev, {
+              id: balloonIdRef.current++,
+              color: randomColor,
+              left: randomPos,
+              content
+            }]);
+          }
+        }, 3500);
+        intervalsRef.current.push(interval1, interval2);
+      } else {
+        // Hard mode: faster spawning and overlapping balloons
+        const interval1 = setInterval(() => {
+            if (!isPausedRef.current) {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+            const text = generateContent(modeRef.current);
+            const content: BalloonContent = {
+              text,
+              typedText: '',
+              isCompleted: false,
+              isDistraction: false
+            };
+            setBalloons(prev => [...prev, {
+              id: balloonIdRef.current++,
+              color: randomColor,
+              left: randomPos,
+              content
+            }]);
+          }
+        }, 1800);
+        const interval2 = setInterval(() => {
+            if (!isPausedRef.current) {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+            const text = generateContent(modeRef.current);
+            const content: BalloonContent = {
+              text,
+              typedText: '',
+              isCompleted: false,
+              isDistraction: false
+            };
+            setBalloons(prev => [...prev, {
+              id: balloonIdRef.current++,
+              color: randomColor,
+              left: randomPos,
+              content
+            }]);
+          }
+        }, 2200);
+        const interval3 = setInterval(() => {
+            if (!isPausedRef.current) {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+            const text = generateContent(modeRef.current);
+            const content: BalloonContent = {
+              text,
+              typedText: '',
+              isCompleted: false,
+              isDistraction: false
+            };
+            setBalloons(prev => [...prev, {
+              id: balloonIdRef.current++,
+              color: randomColor,
+              left: randomPos,
+              content
+            }]);
+          }
+        }, 2800);
+        intervalsRef.current.push(interval1, interval2, interval3);
+      }
+
+      // Independent distraction balloon spawning - multiple intervals for more balloons
+      const distractionInterval1 = setInterval(() => {
+        console.log('Distraction balloon check 1 - random number:', Math.random());
+        if (!isPausedRef.current && Math.random() < 0.6) {
+          console.log('Spawning distraction balloon 1!');
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const content: BalloonContent = {
+            text: '',
+            typedText: '',
+            isCompleted: false,
+            isDistraction: true
+          };
+          setBalloons(prev => {
+            const newBalloon = {
+              id: balloonIdRef.current++,
+              color: randomColor,
+              left: randomPos,
+              content
+            };
+            console.log('Adding distraction balloon to state:', newBalloon);
+            return [...prev, newBalloon];
+          });
+        }
+      }, 1500);
+      
+      const distractionInterval2 = setInterval(() => {
+        console.log('Distraction balloon check 2 - random number:', Math.random());
+        if (!isPausedRef.current && Math.random() < 0.6) {
+          console.log('Spawning distraction balloon 2!');
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const randomPos = Math.round((Math.random() * 0.85 + 0.05) * 100);
+          const content: BalloonContent = {
+            text: '',
+            typedText: '',
+            isCompleted: false,
+            isDistraction: true
+          };
+          setBalloons(prev => {
+            const newBalloon = {
+              id: balloonIdRef.current++,
+              color: randomColor,
+              left: randomPos,
+              content
+            };
+            console.log('Adding distraction balloon to state:', newBalloon);
+            return [...prev, newBalloon];
+          });
+        }
+      }, 2500);
+      
+      intervalsRef.current.push(distractionInterval1, distractionInterval2);
+      
+      console.log('Started distraction balloon spawning (60% chance every 1.5s and 2.5s)');
+      console.log('Total intervals created:', intervalsRef.current.length);
+      console.log('Distraction intervals:', [distractionInterval1, distractionInterval2]);
     return () => {
       intervalsRef.current.forEach(interval => clearInterval(interval));
     };
-  }, [startBalloonSpawning]);
+  }, [mode]); // Run when mode changes
+
 
   useEffect(() => {
     if (missed >= 5) {
@@ -311,4 +646,4 @@ const Game: React.FC<GameProps> = ({ mode, onGameEnd }) => {
   );
 };
 
-export 
+export default Game;
