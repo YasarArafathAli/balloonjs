@@ -13,7 +13,7 @@ interface CloudProps {
   cloudId: number;
 }
 
-const Cloud: React.FC<CloudProps> = ({ color, top, content, onPop, onMiss, isPaused, gameMode, cloudId }) => {
+const Cloud: React.FC<CloudProps> = ({ color, top, content, onPop: _onPop, onMiss, isPaused, gameMode, cloudId }) => {
   // onPop is kept for interface compatibility but not used (typing-based gameplay)
   const cloudRef = useRef<HTMLDivElement>(null);
   const onMissRef = useRef(onMiss);
